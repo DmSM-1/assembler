@@ -20,6 +20,8 @@ section .bss
 section .text
 
 read:
+    pop r15
+    pop r8
     mov rax, 0x0
     mov rdi, 0x0
     mov rsi, input
@@ -57,12 +59,17 @@ read:
         jmp .rloop
 
     .rend:
+    push rdx
+    push r15
     ret
 
 
 convert:
+    pop r15
+    pop rbx
+    pop rsi
     xor rcx, rcx 
-    mov ebx, r10d
+
     .cloop:
         mov edx, 0
         div ebx
@@ -71,6 +78,7 @@ convert:
         cmp eax, 0
         jnz .cloop
     
+    mov rbx, rsi
     .reverse:
         pop rax
         .fc:
@@ -94,6 +102,8 @@ convert:
         jnz .reverse
         mov byte[rsi], 10
 
+    push rbx
+    push r15
     ret
 
 
@@ -105,9 +115,8 @@ _start:
         mov rsi, fsist
         mov rdx, flen
         syscall
-        mov r8d, 10
+        push 10
         call read     
-        push rdx
 
     ;read2:
         mov rax, 0x1
@@ -115,10 +124,8 @@ _start:
         mov rsi, ssist
         mov rdx, slen
         syscall
-        mov r8d, 10
+        push 10
         call read    
-        mov r10d, edx
-        push rdx
 
     ;read_num:
         mov rax, 0x1
@@ -127,12 +134,13 @@ _start:
         mov rdx, nlen
         syscall
         pop r10
-        pop r8
         call read 
         mov eax, edx
 
     ;get_result:
         mov rsi, result
+        push rsi
+        push r10
         call convert
 
     ;print_result:
@@ -141,8 +149,7 @@ _start:
         mov rsi, res
         mov rdx, rlen
         syscall
-
-        mov rsi, result 
+        pop rsi 
         mov rax, 0x1
         mov rdi, 0x1
         mov rdx, 256
