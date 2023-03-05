@@ -1,19 +1,29 @@
 global _start
 
 
+section .rodata
+    fsist: db "Enter first number base:"
+    flen: equ $-fsist
+    ssist: db "Enter first number base:"
+    slen: equ $-ssist
+    number: db "Enter number:"
+    nlen: equ $-number
+    res: db "Result:"
+    rlen: equ $-res
+
+
 section .bss
-    input:  resb 1024
-    result: resb 1024
+    input:  resb 256
+    result: resb 256
 
 
 section .text
-
 
 read:
     mov rax, 0x0
     mov rdi, 0x0
     mov rsi, input
-    mov rdx, 1024
+    mov rdx, 256
     syscall
 
     mov rsi, input
@@ -21,7 +31,6 @@ read:
     xor ecx, ecx
     .rloop:
         mov eax, r8d
-        
         mov cl, [rsi]
         inc rsi
         cmp cl, 0
@@ -45,12 +54,10 @@ read:
         mul edx
         mov edx, eax
         add edx, ecx
-        
         jmp .rloop
 
     .rend:
     ret
-
 
 
 convert:
@@ -59,7 +66,6 @@ convert:
     .cloop:
         mov edx, 0
         div ebx
-
         push rdx
         inc ecx
         cmp eax, 0
@@ -80,36 +86,68 @@ convert:
         .tc:
             add al, '>'
         .cdefault:
-
         mov [rsi], al
         inc rsi
         dec ecx
-    
         cmp ecx, 0
+
         jnz .reverse
+        mov byte[rsi], 10
 
     ret
 
 
 _start:
-    mov r8d, 10
-    call read;первая система     
-    mov r9d, edx
-    call read;вторая система    
-    mov r10d, edx
-    mov r8d, r9d
-    call read;число 
-    mov eax, edx
 
-    mov rsi, result
-    call convert
-    mov rsi, result 
-    mov rax, 0x1
-    mov rdi, 0x1
-    mov rdx, 10
-    syscall
+    ;read1: 
+        mov rax, 0x1
+        mov rdi, 0x1
+        mov rsi, fsist
+        mov rdx, flen
+        syscall
+        mov r8d, 10
+        call read     
+        push rdx
+
+    ;read2:
+        mov rax, 0x1
+        mov rdi, 0x1
+        mov rsi, ssist
+        mov rdx, slen
+        syscall
+        mov r8d, 10
+        call read    
+        mov r10d, edx
+        push rdx
+
+    ;read_num:
+        mov rax, 0x1
+        mov rdi, 0x1
+        mov rsi, number
+        mov rdx, nlen
+        syscall
+        pop r10
+        pop r8
+        call read 
+        mov eax, edx
+
+    ;get_result:
+        mov rsi, result
+        call convert
+
+    ;print_result:
+        mov rax, 0x1
+        mov rdi, 0x1
+        mov rsi, res
+        mov rdx, rlen
+        syscall
+
+        mov rsi, result 
+        mov rax, 0x1
+        mov rdi, 0x1
+        mov rdx, 256
+        syscall
 
     mov rax, 0x1
     mov rbx, 0x0
-    int 80h
-        
+    int 80h 
