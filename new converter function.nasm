@@ -64,12 +64,14 @@ convert:
     ;push   system
     ;push   output
     ;return output
+    ;return len_output
     pop r15
     pop rsi
     pop rbx
     pop rax
     
-    add rsi, 1000
+    add rsi, 255
+    mov rcx, rsi
     mov byte[rsi], 10
 
     .cloop:
@@ -83,6 +85,10 @@ convert:
         cmp rax, 0
         jnz .cloop  
     
+    sub rcx, rsi
+    inc rcx
+
+    push rcx
     push rsi
     push r15
     ret
@@ -134,9 +140,9 @@ _start:
         mov rax, 0x1
         mov rdi, 0x1
         pop rsi
-        mov rdx, 256
+        pop rdx
         syscall
 
-    mov rax, 0x1
-    mov rbx, 0x0
-    int 80h 
+    mov rax, 0x3c
+    mov rdi, 0x0
+    syscall 
