@@ -4,7 +4,7 @@ global _start
 section .rodata
     fsist: db "Enter first number base:"
     flen: equ $-fsist
-    ssist: db "Enter first number base:"
+    ssist: db "Enter second number base:"
     slen: equ $-ssist
     number: db "Enter number:"
     nlen: equ $-number
